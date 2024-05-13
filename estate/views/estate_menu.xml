@@ -1,7 +1,12 @@
 <odoo>
     <menuitem id="estate_property_root" name="Estate Property">
-        <menuitem id="estate_property_first_level" name="First">
-            <menuitem id="estate_property_action" action="estate_property_view"/>
+        <menuitem id="estate_property_first_level" name="Estate">
+            <menuitem id="estate_property_action" name="Property" action="estate_property_view"/>
+            <menuitem id="estate_property_offer_action" name="Offer" action="estate_property_offer_view"/>
+        </menuitem>
+        <menuitem id="estate_property_type_first_level" name="Setting">
+            <menuitem id="estate_property_type_action" name="Type" action="estate_property_type_view"/>
+            <menuitem id="estate_property_tag_action" name="Tag" action="estate_property_tag_view"/>
         </menuitem>
     </menuitem>
 </odoo>
