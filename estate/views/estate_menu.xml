@@ -1,5 +1,5 @@
 <odoo>
-    <menuitem id="estate_property_root" name="Estate Property">
+    <menuitem id="estate_property_root" name="Advertisement">
         <menuitem id="estate_property_first_level" name="Estate">
             <menuitem id="estate_property_action" name="Property" action="estate_property_view"/>
             <menuitem id="estate_property_offer_action" name="Offer" action="estate_property_offer_view"/>
