@@ -7,6 +7,10 @@ from odoo.tools.float_utils import float_is_zero
 class EstatePropertyOffer(models.Model):
     _name = 'estate.property.offer'
     _description = 'Estate Property Offer'
+    _sql_constraints = [
+        ('check_price_positive', 'CHECK (price>0)', 'Offer price must be positive'),
+    ]
+    _order = 'price desc'
 
     price = fields.Float(string="Price")
     status = fields.Selection([
@@ -21,10 +25,6 @@ class EstatePropertyOffer(models.Model):
 
     property_type_id = fields.Many2one(related='property_id.property_type_id', store=True)
 
-    _sql_constraints = [
-        ('check_price_positive', 'CHECK (price>0)', 'Offer price must be positive'),
-    ]
-
     @api.depends('validity')
     def _computed_date_deadline(selfs):
         for offer in selfs:
@@ -37,16 +37,16 @@ class EstatePropertyOffer(models.Model):
 
     def action_accept_offer(self):
         self.ensure_one()
+        print(self.price, self.property_id.expected_price * 0.9)
         if "accepted" in self.property_id.offer_ids.mapped('status'):
             raise UserError(_("This property is already accepted offer."))
-        if self.property_id.selling_price > self.property_id.expected_price * 0.9 or float_is_zero(
-                self.property_id.selling_price,
-                precision_rounding=2):
+        if self.price < self.property_id.expected_price * 0.9:
             raise ValidationError(_("Selling price must be greater than expected price (90%)"))
 
         self.property_id.selling_price = self.price
         self.property_id.buyer_id = self.partner_id
         self.status = 'accepted'
+        self.property_id.state = 'accepted'
 
     def action_refuse_offer(self):
         self.ensure_one()

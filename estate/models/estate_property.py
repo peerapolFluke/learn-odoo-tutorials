@@ -6,6 +6,11 @@ from odoo.tools.float_utils import float_is_zero
 class EstateProperty(models.Model):
     _name = 'estate.property'
     _description = "Estate Property Description"
+    _sql_constraints = [
+        ('expected_price_positive', 'CHECK (expected_price>0)', 'Expected price must be positive'),
+        ('selling_price_positive', 'CHECK (selling_price>=0)', 'Selling price must be positive'),
+    ]
+    _order = 'id desc'
 
     name = fields.Char(required=True)
     description = fields.Text()
@@ -43,11 +48,6 @@ class EstateProperty(models.Model):
 
     tag_ids = fields.Many2many('estate.property.tag')
 
-    _sql_constraints = [
-        ('expected_price_positive', 'CHECK (expected_price>0)', 'Expected price must be positive'),
-        ('selling_price_positive', 'CHECK (selling_price>=0)', 'Selling price must be positive'),
-    ]
-
     @api.depends('living_area', 'garden_area')
     def _calTotalArea(selfs):
         for rec in selfs:
@@ -79,7 +79,7 @@ class EstateProperty(models.Model):
     @api.constrains('selling_price')
     def _check_selling_price(selfs):
         for estate in selfs:
-            if estate.selling_price > estate.expected_price * 0.9 or float_is_zero(estate.selling_price,
+            if estate.selling_price < estate.expected_price * 0.9 or float_is_zero(estate.selling_price,
                                                                                    precision_rounding=2):
                 raise ValidationError(_("Selling price must be greater than expected price (90%)"))
 

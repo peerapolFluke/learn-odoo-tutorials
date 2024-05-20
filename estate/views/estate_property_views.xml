@@ -24,8 +24,10 @@
         <field name="arch" type="xml">
             <form string="Estate Property">
                 <header>
-                    <button type="object" name="action_sold" string="SOLD"/>
-                    <button type="object" name="action_cancel" string="CANCEL"/>
+                    <button type="object" name="action_sold" string="SOLD"
+                            invisible="state in ('sold','canceled')"/>
+                    <button type="object" name="action_cancel" string="CANCEL"
+                            invisible="state in ('sold','canceled')"/>
 
                     <field name="state" widget="statusbar"/>
                 </header>
@@ -56,13 +58,14 @@
                                 <field name="living_area"/>
                                 <field name="garage"/>
                                 <field name="garden"/>
-                                <field name="garden_area"/>
-                                <field name="garden_orientation" widget="radio" options="{'horizontal': true}"/>
+                                <field name="garden_area" invisible="garden != True"/>
+                                <field name="garden_orientation" widget="radio" options="{'horizontal': true}"
+                                       invisible="garden != True"/>
                                 <field name="total_area"/>
                             </group>
                         </page>
                         <page string="Offers">
-                            <field name="offer_ids"/>
+                            <field name="offer_ids" readonly="state in ('accepted','sold','canceled')"/>
                         </page>
                         <page string="Other Info">
                             <group>
@@ -80,15 +83,20 @@
         <field name="name">estate.property.view.tree</field>
         <field name="model">estate.property</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree string="property"
+                  decoration-success="state in ('received','accepted')"
+                  decoration-bf="state == 'accepted'"
+                  decoration-muted="state == 'sold'"
+            >
                 <field name="name" string="Title"/>
-                <field name="postcode"/>
+                <field name="postcode" optional="True"/>
                 <field name="bedrooms"/>
                 <field name="living_area"/>
                 <field name="expected_price"/>
                 <field name="selling_price"/>
                 <field name="date_availability"/>
                 <field name="property_type_id"/>
+                <field name="state"/>
             </tree>
         </field>
     </record>
