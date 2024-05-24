@@ -1,7 +1,7 @@
 from dateutil.relativedelta import relativedelta
+
 from odoo import fields, models, api, _
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools.float_utils import float_is_zero
 
 
 class EstatePropertyOffer(models.Model):
@@ -25,14 +25,30 @@ class EstatePropertyOffer(models.Model):
 
     property_type_id = fields.Many2one(related='property_id.property_type_id', store=True)
 
+    # Override create method
+    @api.model_create_multi
+    def create(self, vals):
+        res = super().create(vals)
+        for val in vals:
+            property_rec = self.env['estate.property'].browse(
+                val['property_id']
+            )
+            for data in property_rec:
+                if val['price'] < max(data.offer_ids.mapped('price')):
+                    raise UserError(_("This property is already have more valuable offer."))
+            property_rec.write({
+                'state': 'received'
+            })
+        return res
+
     @api.depends('validity')
-    def _computed_date_deadline(selfs):
-        for offer in selfs:
+    def _computed_date_deadline(self):
+        for offer in self:
             offer.date_deadline = fields.Date.today() + relativedelta(days=offer.validity)
 
     @api.depends('date_deadline')
-    def _inverse_date_deadline(selfs):
-        for rec in selfs:
+    def _inverse_date_deadline(self):
+        for rec in self:
             rec.validity = (rec.date_deadline - fields.Date.today()).days
 
     def action_accept_offer(self):

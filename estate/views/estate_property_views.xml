@@ -8,12 +8,13 @@
                 <field name="postcode"/>
                 <field name="expected_price"/>
                 <field name="bedrooms"/>
-                <field name="living_area"/>
+                <field name="living_area" filter_domain="[('living_area', '>=',  self)]"/>
                 <field name="facades"/>
                 <field name="property_type_id"/>
                 <filter name="filter_state_new" string="New Properties" domain="[('state','=','new')]"/>
                 <filter name="filter_state_received" string="Offer Received" domain="[('state','=','received')]"/>
                 <filter name="group_by_postcode" string="Postcode" context="{'group_by': 'postcode'}"/>
+                <filter name="filter_available" string="Available" domain="[('state', '=', 'new')]"/>
             </search>
         </field>
     </record>
@@ -75,6 +76,10 @@
                         </page>
                     </notebook>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>
@@ -105,5 +110,6 @@
         <field name="name">Property Lists</field>
         <field name="res_model">estate.property</field>
         <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_filter_available': True}</field>
     </record>
 </odoo>

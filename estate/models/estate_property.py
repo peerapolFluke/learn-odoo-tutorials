@@ -11,6 +11,7 @@ class EstateProperty(models.Model):
         ('selling_price_positive', 'CHECK (selling_price>=0)', 'Selling price must be positive'),
     ]
     _order = 'id desc'
+    _inherit = ['mail.thread']
 
     name = fields.Char(required=True)
     description = fields.Text()
@@ -48,6 +49,12 @@ class EstateProperty(models.Model):
 
     tag_ids = fields.Many2many('estate.property.tag')
 
+    # Override delete method
+    def unlink(self):
+        if self.state not in ["new", "canceled"]:
+            raise UserError(_("You can't be delete this property if state is not new or canceled"))
+        return super().unlink()
+
     @api.depends('living_area', 'garden_area')
     def _calTotalArea(selfs):
         for rec in selfs:
@@ -83,16 +90,16 @@ class EstateProperty(models.Model):
                                                                                    precision_rounding=2):
                 raise ValidationError(_("Selling price must be greater than expected price (90%)"))
 
-    def action_sold(self):
-        self.ensure_one()
-        if self.state == "canceled":
-            raise UserError(_("You can't be canceled on sold property"))
-        self.state = "sold"
-        return True
-
     def action_cancel(self):
         self.ensure_one()
         if self.state == "sold":
             raise UserError(_("You can't be sold on canceled property"))
         self.state = "canceled"
+        return True
+
+    def action_sold(self):
+        self.ensure_one()
+        if self.state == "canceled":
+            raise UserError(_("You can't be canceled on sold property"))
+        self.state = "sold"
         return True
