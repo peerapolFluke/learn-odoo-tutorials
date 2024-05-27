@@ -4,6 +4,26 @@
     <t t-name="awesome_owl.playground">
         <div class="p-3">
             hello world
+            <Counter onChange.bind="onCounterChange"/>
+            <Counter onChange.bind="onCounterChange"/>
+        </div>
+        <div class="p-3">
+            <p>The sum is: <t t-esc="state.totalCounter"></t></p>
+        </div>
+        <div>
+            <Card title="'card1'">
+                <t t-set-slot="body">
+                    <Counter onChange.bind="onCounterChange"/>
+                </t>
+            </Card>
+            <Card title="'card2'">
+                <t t-set-slot="body">
+                    <Counter onChange.bind="onCounterChange"/>
+                </t>
+            </Card>
+        </div>
+        <div>
+            <TodoList/>
         </div>
     </t>
 
